@@ -107,6 +107,167 @@
     });
   }
 
+  /* --- İzometrik 3D model üretimi --- */
+  var ISO_C = 0.866, ISO_S = 0.5;
+
+  function isoPt(x, y, z) {
+    return [(x - y) * ISO_C, (x + y) * ISO_S - z];
+  }
+
+  function polyStr(pts) {
+    return pts
+      .map(function (p) {
+        return p[0].toFixed(1) + "," + p[1].toFixed(1);
+      })
+      .join(" ");
+  }
+
+  // Bir kutunun görünen üç yüzünün köşe noktaları
+  function boxPolys(x0, y0, z0, w, dep, h) {
+    return {
+      top: [
+        isoPt(x0, y0, z0 + h),
+        isoPt(x0 + w, y0, z0 + h),
+        isoPt(x0 + w, y0 + dep, z0 + h),
+        isoPt(x0, y0 + dep, z0 + h)
+      ],
+      left: [
+        isoPt(x0, y0 + dep, z0),
+        isoPt(x0 + w, y0 + dep, z0),
+        isoPt(x0 + w, y0 + dep, z0 + h),
+        isoPt(x0, y0 + dep, z0 + h)
+      ],
+      right: [
+        isoPt(x0 + w, y0, z0),
+        isoPt(x0 + w, y0 + dep, z0),
+        isoPt(x0 + w, y0 + dep, z0 + h),
+        isoPt(x0 + w, y0, z0 + h)
+      ]
+    };
+  }
+
+  // Hex rengi yüzdeye göre açar (+) veya koyulaştırır (-)
+  function shade(hex, pct) {
+    hex = String(hex).replace("#", "");
+    if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    var r = parseInt(hex.slice(0, 2), 16);
+    var g = parseInt(hex.slice(2, 4), 16);
+    var b = parseInt(hex.slice(4, 6), 16);
+    var f = pct / 100;
+    function adj(v) {
+      return Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f);
+    }
+    return "rgb(" + adj(r) + "," + adj(g) + "," + adj(b) + ")";
+  }
+
+  function classify(name) {
+    var n = name.toLowerCase();
+    if (/masa|tezg|ada|sehpa|toplant/.test(n)) return "table";
+    if (/kitapl|raf|vitrin/.test(n)) return "shelf";
+    if (/karyola|yatak/.test(n)) return "bed";
+    if (/sandalye|tabure/.test(n)) return "seat";
+    return "box";
+  }
+
+  // piece (w,h,d cm) ve renk hex'inden izometrik 3D SVG modeli üretir
+  function buildModel(piece, hex) {
+    var type = classify(piece.name);
+    var k = 58 / Math.max(piece.w, piece.h, piece.d);
+    var W = piece.w * k, H = piece.h * k, D = piece.d * k;
+    var parts = [];
+
+    function part(x0, y0, z0, w, dep, h) {
+      return { x0: x0, y0: y0, z0: z0, w: w, dep: dep, h: h };
+    }
+
+    if (type === "table") {
+      var slabH = Math.max(3, H * 0.12);
+      var legT = Math.max(2.5, Math.min(W, D) * 0.14);
+      parts.push(part(0, 0, H - slabH, W, D, slabH));
+      parts.push(part(0, 0, 0, legT, legT, H - slabH));
+      parts.push(part(W - legT, 0, 0, legT, legT, H - slabH));
+      parts.push(part(0, D - legT, 0, legT, legT, H - slabH));
+      parts.push(part(W - legT, D - legT, 0, legT, legT, H - slabH));
+    } else if (type === "bed") {
+      var hb = Math.max(3, W * 0.08);
+      parts.push(part(0, 0, 0, hb, D, H));
+      parts.push(part(hb, 0, 0, W - hb, D, H * 0.42));
+    } else if (type === "seat") {
+      var seatH = H * 0.5;
+      var slab = Math.max(3, H * 0.1);
+      var lt = Math.max(2, Math.min(W, D) * 0.12);
+      parts.push(part(0, 0, seatH - slab, W, D, slab));
+      if (!/tabure/.test(piece.name.toLowerCase())) {
+        parts.push(part(0, 0, seatH, Math.max(3, W * 0.12), D, H - seatH));
+      }
+      parts.push(part(0, 0, 0, lt, lt, seatH - slab));
+      parts.push(part(W - lt, 0, 0, lt, lt, seatH - slab));
+      parts.push(part(0, D - lt, 0, lt, lt, seatH - slab));
+      parts.push(part(W - lt, D - lt, 0, lt, lt, seatH - slab));
+    } else {
+      parts.push(part(0, 0, 0, W, D, H));
+    }
+
+    parts.sort(function (a, b) {
+      return a.x0 + a.y0 + a.z0 - (b.x0 + b.y0 + b.z0);
+    });
+
+    var pts = [];
+    var svg = "";
+    var faceShades = [["right", -26], ["left", -8], ["top", 20]];
+    parts.forEach(function (pp) {
+      var f = boxPolys(pp.x0, pp.y0, pp.z0, pp.w, pp.dep, pp.h);
+      faceShades.forEach(function (fs) {
+        var poly = f[fs[0]];
+        poly.forEach(function (p) {
+          pts.push(p);
+        });
+        svg +=
+          '<polygon points="' + polyStr(poly) + '" fill="' + shade(hex, fs[1]) +
+          '" stroke="rgba(0,0,0,.28)" stroke-width="0.6" stroke-linejoin="round"/>';
+      });
+    });
+
+    // Raf/vitrin: ön yüze yatay raf çizgileri
+    if (type === "shelf") {
+      var ff = boxPolys(0, 0, 0, W, D, H);
+      var bl = ff.left[0], br = ff.left[1], tr = ff.left[2], tl = ff.left[3];
+      for (var i = 1; i < 4; i++) {
+        var t = i / 4;
+        svg +=
+          '<line x1="' + (bl[0] + (tl[0] - bl[0]) * t).toFixed(1) +
+          '" y1="' + (bl[1] + (tl[1] - bl[1]) * t).toFixed(1) +
+          '" x2="' + (br[0] + (tr[0] - br[0]) * t).toFixed(1) +
+          '" y2="' + (br[1] + (tr[1] - br[1]) * t).toFixed(1) +
+          '" stroke="rgba(0,0,0,.3)" stroke-width="0.8"/>';
+      }
+    }
+
+    // Dolap: ön yüze kapak ayrım çizgisi
+    if (type === "box") {
+      var bf = boxPolys(0, 0, 0, W, D, H);
+      var mb = [(bf.left[0][0] + bf.left[1][0]) / 2, (bf.left[0][1] + bf.left[1][1]) / 2];
+      var mt = [(bf.left[3][0] + bf.left[2][0]) / 2, (bf.left[3][1] + bf.left[2][1]) / 2];
+      svg +=
+        '<line x1="' + mb[0].toFixed(1) + '" y1="' + mb[1].toFixed(1) +
+        '" x2="' + mt[0].toFixed(1) + '" y2="' + mt[1].toFixed(1) +
+        '" stroke="rgba(0,0,0,.22)" stroke-width="0.8"/>';
+    }
+
+    var xs = pts.map(function (p) { return p[0]; });
+    var ys = pts.map(function (p) { return p[1]; });
+    var minX = Math.min.apply(null, xs) - 2;
+    var maxX = Math.max.apply(null, xs) + 2;
+    var minY = Math.min.apply(null, ys) - 2;
+    var maxY = Math.max.apply(null, ys) + 2;
+
+    return (
+      '<svg viewBox="' + minX.toFixed(1) + " " + minY.toFixed(1) + " " +
+      (maxX - minX).toFixed(1) + " " + (maxY - minY).toFixed(1) +
+      '" xmlns="http://www.w3.org/2000/svg">' + svg + "</svg>"
+    );
+  }
+
   /* --- Render iskeleti --- */
   function template(pieces) {
     var pieceOpts = pieces
@@ -266,6 +427,10 @@
       photo.classList.add("has-photo");
       changeBtn.hidden = false;
       clearBtn.hidden = false;
+      // Fotoğraf yoktan eklendiyse, listedeki ürünler için modelleri oluştur
+      cart.forEach(function (it) {
+        if (!it.marker) addModel(it);
+      });
     }
 
     function clearPhoto() {
@@ -278,7 +443,7 @@
     }
 
     photo.addEventListener("click", function (e) {
-      if (e.target.closest(".cfg-marker")) return;
+      if (e.target.closest(".cfg-marker, .cfg-model")) return;
       if (!photo.classList.contains("has-photo")) fileInput.click();
     });
     changeBtn.addEventListener("click", function () {
@@ -309,6 +474,7 @@
     function makeDraggable(el) {
       var dragging = false, offX = 0, offY = 0;
       el.addEventListener("pointerdown", function (e) {
+        if (e.target.closest(".cfg-model-resize, .cfg-model-del")) return;
         dragging = true;
         el.setPointerCapture(e.pointerId);
         var r = el.getBoundingClientRect();
@@ -335,17 +501,53 @@
       el.addEventListener("pointercancel", end);
     }
 
-    function addMarker(item) {
-      var m = document.createElement("div");
-      m.className = "cfg-marker";
-      m.dataset.id = item.id;
-      m.style.left = 30 + ((cart.length * 18) % 120) + "px";
-      m.style.top = 30 + ((cart.length * 22) % 120) + "px";
-      m.innerHTML =
-        '<span class="num">' + item.no + "</span>" + escapeHtml(item.name);
-      photo.appendChild(m);
-      makeDraggable(m);
-      item.marker = m;
+    /* --- 3D model boyutlandırma --- */
+    function makeResizable(el) {
+      var handle = el.querySelector(".cfg-model-resize");
+      if (!handle) return;
+      var resizing = false, startX = 0, startW = 0;
+      handle.addEventListener("pointerdown", function (e) {
+        e.stopPropagation();
+        resizing = true;
+        handle.setPointerCapture(e.pointerId);
+        startX = e.clientX;
+        startW = el.offsetWidth;
+      });
+      handle.addEventListener("pointermove", function (e) {
+        if (!resizing) return;
+        var nw = Math.max(60, Math.min(360, startW + (e.clientX - startX)));
+        el.style.width = nw + "px";
+      });
+      function end() {
+        resizing = false;
+      }
+      handle.addEventListener("pointerup", end);
+      handle.addEventListener("pointercancel", end);
+    }
+
+    /* Fotoğraf üzerine 3D modeli yerleştir */
+    function addModel(item) {
+      var idx = cart.indexOf(item);
+      if (idx < 0) idx = cart.length;
+      var wrap = document.createElement("div");
+      wrap.className = "cfg-model";
+      wrap.dataset.id = item.id;
+      wrap.style.left = 24 + ((idx * 26) % 150) + "px";
+      wrap.style.top = 24 + ((idx * 30) % 150) + "px";
+      wrap.innerHTML =
+        '<span class="cfg-model-badge">' + item.no + "</span>" +
+        '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
+        buildModel(item.piece, item.hex) +
+        '<span class="cfg-model-name">' + escapeHtml(item.name) + "</span>" +
+        '<span class="cfg-model-resize" title="Boyutlandır"></span>';
+      photo.appendChild(wrap);
+      makeDraggable(wrap);
+      makeResizable(wrap);
+      wrap.querySelector(".cfg-model-del").addEventListener("click", function (e) {
+        e.stopPropagation();
+        removeItem(item.id);
+      });
+      item.marker = wrap;
     }
 
     /* --- Sepet --- */
@@ -402,7 +604,10 @@
       // numaraları yeniden sırala
       cart.forEach(function (it, i) {
         it.no = i + 1;
-        if (it.marker) it.marker.querySelector(".num").textContent = it.no;
+        if (it.marker) {
+          var badge = it.marker.querySelector(".cfg-model-badge");
+          if (badge) badge.textContent = it.no;
+        }
       });
       renderCart();
     }
@@ -430,10 +635,12 @@
         spec: spec,
         qty: qty,
         unit: unit,
-        total: unit * qty
+        total: unit * qty,
+        piece: { name: p.name, w: parseFloat(wIn.value) || p.w, h: parseFloat(hIn.value) || p.h, d: parseFloat(dIn.value) || p.d },
+        hex: color.hex
       };
       cart.push(item);
-      if (photo.classList.contains("has-photo")) addMarker(item);
+      if (photo.classList.contains("has-photo")) addModel(item);
       renderCart();
     }
 

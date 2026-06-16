@@ -99,6 +99,114 @@
   font-size: 0.7rem;
 }
 
+/* Fotoğraf üzerindeki 3D modeller */
+.cfg-model {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  width: 130px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35));
+  z-index: 2;
+}
+
+.cfg-model.dragging {
+  cursor: grabbing;
+  z-index: 5;
+}
+
+.cfg-model svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cfg-model-badge {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.cfg-model-del {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.78);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 3;
+}
+
+.cfg-model:hover .cfg-model-del {
+  opacity: 1;
+}
+
+.cfg-model-name {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translate(-50%, 100%);
+  background: rgba(26, 26, 26, 0.82);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.cfg-model:hover .cfg-model-name {
+  opacity: 1;
+}
+
+.cfg-model-resize {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent);
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 3;
+  touch-action: none;
+}
+
+.cfg-model:hover .cfg-model-resize {
+  opacity: 1;
+}
+
 .cfg-photo-actions {
   display: flex;
   gap: 10px;

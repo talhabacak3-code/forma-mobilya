@@ -9,6 +9,9 @@ Desktop.ini
 .idea/
 *.swp
 
+# Yerel önizleme araçları
+.claude/
+
 # Loglar
 *.log
 npm-debug.log*
