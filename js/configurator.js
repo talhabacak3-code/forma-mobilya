@@ -311,22 +311,7 @@
 
     return (
       '<div class="cfg">' +
-      // Sol: fotoğraf sahnesi
-      '<div class="cfg-stage">' +
-      '<div class="cfg-photo" data-drop>' +
-      '<input type="file" accept="image/*" hidden data-file>' +
-      '<div class="cfg-photo-empty">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="9" r="1.5"/></svg>' +
-      "<strong>Odanın fotoğrafını yükle</strong>" +
-      "Sürükle bırak ya da tıklayarak seç (JPG / PNG)</div>" +
-      "</div>" +
-      '<div class="cfg-photo-actions">' +
-      '<button type="button" class="cfg-link" data-change hidden>Fotoğrafı değiştir</button>' +
-      '<button type="button" class="cfg-link" data-clear hidden>Kaldır</button>' +
-      "</div>" +
-      '<p class="cfg-hint">İpucu: Mobilya ekledikçe fotoğraf üzerinde numaralı etiketler belirir — sürükleyerek konumlandırabilirsin.</p>' +
-      "</div>" +
-      // Sağ: panel
+      // Fiyatlandırma paneli
       '<div class="cfg-panel">' +
       '<div class="cfg-field"><label>Mobilya</label><select class="cfg-select" data-piece>' + pieceOpts + "</select></div>" +
       '<div class="cfg-field"><label>Ölçü (cm)</label><div class="cfg-dims">' +
@@ -442,6 +427,7 @@
       // etiketleri koru ya da temizle — koruyoruz; sadece arka plan kalkar
     }
 
+    if (photo) {
     photo.addEventListener("click", function (e) {
       if (e.target.closest(".cfg-marker, .cfg-model")) return;
       if (!photo.classList.contains("has-photo")) fileInput.click();
@@ -469,6 +455,7 @@
       var f = e.dataTransfer && e.dataTransfer.files[0];
       if (f) setPhoto(f);
     });
+    }
 
     /* --- Etiket sürükleme --- */
     function makeDraggable(el) {
@@ -721,7 +708,7 @@
         finishId: fin.id
       };
       cart.push(item);
-      if (photo.classList.contains("has-photo")) addModel(item);
+      if (photo && photo.classList.contains("has-photo")) addModel(item);
       renderCart();
     }
 

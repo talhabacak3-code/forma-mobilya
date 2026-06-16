@@ -1,10 +1,8 @@
 /* ===== Forma Mobilya — Oda Tasarlayıcı (Configurator) ===== */
 
 .cfg {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 28px;
-  align-items: start;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 /* --- Sahne / fotoğraf alanı --- */
@@ -434,7 +432,8 @@
 
 /* --- Sepet / teklif --- */
 .cfg-cart {
-  margin-top: 28px;
+  max-width: 680px;
+  margin: 28px auto 0;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
