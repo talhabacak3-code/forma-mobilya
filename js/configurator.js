@@ -525,24 +525,103 @@
       handle.addEventListener("pointercancel", end);
     }
 
-    /* Fotoğraf üzerine 3D modeli yerleştir */
+    /* Sadece bir tutamaçtan taşıma (3D modelde gövde döndürme içindir) */
+    function makeMovable(el, handle) {
+      var moving = false, offX = 0, offY = 0;
+      handle.addEventListener("pointerdown", function (e) {
+        e.stopPropagation();
+        moving = true;
+        handle.setPointerCapture(e.pointerId);
+        var r = el.getBoundingClientRect();
+        offX = e.clientX - r.left;
+        offY = e.clientY - r.top;
+        el.classList.add("dragging");
+      });
+      handle.addEventListener("pointermove", function (e) {
+        if (!moving) return;
+        var cr = photo.getBoundingClientRect();
+        var x = Math.max(0, Math.min(e.clientX - cr.left - offX, cr.width - el.offsetWidth));
+        var y = Math.max(0, Math.min(e.clientY - cr.top - offY, cr.height - el.offsetHeight));
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+        el.style.right = "auto";
+      });
+      function end() {
+        moving = false;
+        el.classList.remove("dragging");
+      }
+      handle.addEventListener("pointerup", end);
+      handle.addEventListener("pointercancel", end);
+    }
+
+    function makeResizable3D(el, item) {
+      var handle = el.querySelector(".cfg-model-resize");
+      if (!handle) return;
+      var resizing = false, startX = 0, startW = 0;
+      handle.addEventListener("pointerdown", function (e) {
+        e.stopPropagation();
+        resizing = true;
+        handle.setPointerCapture(e.pointerId);
+        startX = e.clientX;
+        startW = el.offsetWidth;
+      });
+      handle.addEventListener("pointermove", function (e) {
+        if (!resizing) return;
+        var nw = Math.max(90, Math.min(420, startW + (e.clientX - startX)));
+        el.style.width = nw + "px";
+        if (item.three) item.three.setSize(nw, nw);
+      });
+      function end() {
+        resizing = false;
+      }
+      handle.addEventListener("pointerup", end);
+      handle.addEventListener("pointercancel", end);
+    }
+
+    /* Fotoğraf üzerine modeli yerleştir (Three.js varsa gerçek 3D) */
     function addModel(item) {
       var idx = cart.indexOf(item);
       if (idx < 0) idx = cart.length;
       var wrap = document.createElement("div");
       wrap.className = "cfg-model";
       wrap.dataset.id = item.id;
-      wrap.style.left = 24 + ((idx * 26) % 150) + "px";
-      wrap.style.top = 24 + ((idx * 30) % 150) + "px";
-      wrap.innerHTML =
-        '<span class="cfg-model-badge">' + item.no + "</span>" +
-        '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
-        buildModel(item.piece, item.hex) +
-        '<span class="cfg-model-name">' + escapeHtml(item.name) + "</span>" +
-        '<span class="cfg-model-resize" title="Boyutlandır"></span>';
-      photo.appendChild(wrap);
-      makeDraggable(wrap);
-      makeResizable(wrap);
+      wrap.style.left = 24 + ((idx * 28) % 160) + "px";
+      wrap.style.top = 24 + ((idx * 32) % 150) + "px";
+
+      var use3D = window.Furniture3D && window.Furniture3D.available();
+
+      if (use3D) {
+        wrap.classList.add("cfg-model--3d");
+        wrap.style.width = "180px";
+        wrap.innerHTML =
+          '<span class="cfg-model-badge">' + item.no + "</span>" +
+          '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
+          '<button type="button" class="cfg-model-move" title="Taşı">✥</button>' +
+          '<div class="cfg-model-canvas"></div>' +
+          '<span class="cfg-model-name">' + escapeHtml(item.name) + "</span>" +
+          '<span class="cfg-model-resize" title="Boyutlandır"></span>';
+        photo.appendChild(wrap);
+        var host = wrap.querySelector(".cfg-model-canvas");
+        item.three = window.Furniture3D.create(host, item.piece, {
+          color: item.hex,
+          finish: item.finishId,
+          size: 180
+        });
+        makeMovable(wrap, wrap.querySelector(".cfg-model-move"));
+        makeResizable3D(wrap, item);
+      } else {
+        wrap.style.width = "130px";
+        wrap.innerHTML =
+          '<span class="cfg-model-badge">' + item.no + "</span>" +
+          '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
+          buildModel(item.piece, item.hex) +
+          '<span class="cfg-model-name">' + escapeHtml(item.name) + "</span>" +
+          '<span class="cfg-model-resize" title="Boyutlandır"></span>';
+        photo.appendChild(wrap);
+        makeDraggable(wrap);
+        makeResizable(wrap);
+      }
+
       wrap.querySelector(".cfg-model-del").addEventListener("click", function (e) {
         e.stopPropagation();
         removeItem(item.id);
@@ -596,6 +675,7 @@
     function removeItem(id) {
       cart = cart.filter(function (it) {
         if (it.id === id) {
+          if (it.three) it.three.dispose();
           if (it.marker && it.marker.parentNode) it.marker.parentNode.removeChild(it.marker);
           return false;
         }
@@ -637,7 +717,8 @@
         unit: unit,
         total: unit * qty,
         piece: { name: p.name, w: parseFloat(wIn.value) || p.w, h: parseFloat(hIn.value) || p.h, d: parseFloat(dIn.value) || p.d },
-        hex: color.hex
+        hex: color.hex,
+        finishId: fin.id
       };
       cart.push(item);
       if (photo.classList.contains("has-photo")) addModel(item);
