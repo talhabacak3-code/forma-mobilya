@@ -67,6 +67,7 @@ window.FORMA_FIYATLAR = {
       { name: "Alt Mutfak Dolabı", w: 100, h: 85,  d: 60 },
       { name: "Üst Mutfak Dolabı", w: 100, h: 70,  d: 35 },
       { name: "Ada Tezgâhı",       w: 120, h: 90,  d: 80 },
+      { name: "Kahve Köşesi Ünitesi", w: 80, h: 140, d: 45 },
       { name: "Kiler Dolabı",      w: 60,  h: 210, d: 60 },
       { name: "Yemek Masası",      w: 160, h: 75,  d: 90 }
     ],
