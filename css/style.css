@@ -1,0 +1,719 @@
+/* ===== Forma Mobilya — Ortak Stil ===== */
+
+:root {
+  /* Renkler */
+  --bg: #ffffff;
+  --surface: #f6f5f3;
+  --surface-2: #efece7;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --border: #e6e2dc;
+  --accent: #b08968;
+  --accent-dark: #8c6a4f;
+
+  /* Oda gradyanları (placeholder görseller) */
+  --grad-salon: linear-gradient(135deg, #c8a98a, #8c6a4f);
+  --grad-mutfak: linear-gradient(135deg, #a7c4bc, #6b9080);
+  --grad-cocuk: linear-gradient(135deg, #f6b8c1, #f1a6c0);
+  --grad-calisma: linear-gradient(135deg, #9aa7c7, #5c6b9a);
+
+  /* Boşluk & şekil */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(26, 26, 26, 0.08);
+  --shadow-sm: 0 4px 14px rgba(26, 26, 26, 0.06);
+  --maxw: 1140px;
+
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+/* ===== Reset ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* ===== Layout yardımcıları ===== */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: clamp(48px, 8vw, 96px) 0;
+}
+
+.section--surface {
+  background: var(--surface);
+}
+
+.section-head {
+  max-width: 640px;
+  margin: 0 auto clamp(32px, 5vw, 56px);
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section-head h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.section-head p {
+  color: var(--muted);
+  margin-top: 14px;
+  font-size: 1.05rem;
+}
+
+/* ===== Buton ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--accent-dark);
+  transform: translateY(-2px);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn--ghost:hover {
+  background: var(--surface);
+  transform: translateY(-2px);
+}
+
+/* ===== Header / Navbar ===== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.brand .brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accent);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-links a {
+  padding: 9px 14px;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 500;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.nav-links a.active {
+  color: var(--text);
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.nav-toggle span {
+  width: 24px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.nav-toggle.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ===== Hero ===== */
+.hero {
+  padding: clamp(56px, 9vw, 110px) 0;
+  background: linear-gradient(180deg, var(--surface), var(--bg));
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: clamp(32px, 5vw, 64px);
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+}
+
+.hero p {
+  color: var(--muted);
+  font-size: 1.12rem;
+  margin: 20px 0 32px;
+  max-width: 520px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hero-visual {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  background: var(--grad-salon);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.35),
+    transparent 55%
+  );
+}
+
+/* Page hero (oda sayfaları) */
+.page-hero {
+  padding: clamp(48px, 7vw, 80px) 0;
+  background: var(--surface);
+}
+
+.page-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 5vw, 56px);
+  align-items: center;
+}
+
+.page-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.page-hero p {
+  color: var(--muted);
+  font-size: 1.1rem;
+  margin-top: 18px;
+}
+
+.page-hero-visual {
+  aspect-ratio: 5 / 4;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.page-hero-visual svg {
+  width: 38%;
+  height: auto;
+  opacity: 0.92;
+}
+
+/* ===== Oda kartları (ana sayfa) ===== */
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.room-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow);
+}
+
+.room-card-visual {
+  aspect-ratio: 16 / 10;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.room-card-visual svg {
+  width: 76px;
+  height: 76px;
+}
+
+.room-card-body {
+  padding: 24px 24px 28px;
+}
+
+.room-card-body h3 {
+  font-size: 1.35rem;
+}
+
+.room-card-body p {
+  color: var(--muted);
+  margin: 10px 0 18px;
+  font-size: 0.98rem;
+}
+
+.room-card-link {
+  font-weight: 600;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.room-card-link span {
+  transition: transform 0.2s ease;
+}
+
+.room-card:hover .room-card-link span {
+  transform: translateX(4px);
+}
+
+.bg-salon {
+  background: var(--grad-salon);
+}
+.bg-mutfak {
+  background: var(--grad-mutfak);
+}
+.bg-cocuk {
+  background: var(--grad-cocuk);
+}
+.bg-calisma {
+  background: var(--grad-calisma);
+}
+
+/* ===== Değerler / özellikler şeridi ===== */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.value {
+  text-align: center;
+  padding: 8px;
+}
+
+.value .value-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.value h3 {
+  font-size: 1.15rem;
+}
+
+.value p {
+  color: var(--muted);
+  margin-top: 8px;
+  font-size: 0.96rem;
+}
+
+/* ===== Ürün galerisi (oda sayfaları) ===== */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.product-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.product-visual {
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+}
+
+.product-visual svg {
+  width: 60px;
+  height: 60px;
+  opacity: 0.92;
+}
+
+.product-body {
+  padding: 18px 20px 22px;
+}
+
+.product-body h3 {
+  font-size: 1.1rem;
+}
+
+.product-body p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-top: 6px;
+}
+
+.product-tag {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--surface-2);
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+
+/* ===== Özellik listesi (oda ipuçları) ===== */
+.feature-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 40px;
+}
+
+.feature-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.feature-item .check {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.feature-item h3 {
+  font-size: 1.05rem;
+}
+
+.feature-item p {
+  color: var(--muted);
+  font-size: 0.94rem;
+  margin-top: 2px;
+}
+
+/* ===== CTA bandı ===== */
+.cta-band {
+  background: var(--text);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: clamp(36px, 6vw, 64px);
+  text-align: center;
+}
+
+.cta-band h2 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+
+.cta-band p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 14px auto 28px;
+  max-width: 520px;
+}
+
+.cta-band .btn--primary {
+  background: var(--accent);
+}
+.cta-band .btn--primary:hover {
+  background: var(--accent-dark);
+}
+
+/* ===== Oda alt navigasyon (önceki / sonraki) ===== */
+.room-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.room-nav a {
+  flex: 1 1 240px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.room-nav a:hover {
+  background: var(--surface);
+  transform: translateY(-3px);
+}
+
+.room-nav .dir {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.room-nav .name {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-top: 4px;
+}
+
+.room-nav .next {
+  text-align: right;
+}
+
+/* ===== Footer ===== */
+.site-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 56px 0 28px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 32px;
+}
+
+.footer-brand p {
+  color: var(--muted);
+  margin-top: 14px;
+  max-width: 320px;
+  font-size: 0.95rem;
+}
+
+.footer-col h4 {
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.footer-col a {
+  display: block;
+  color: var(--muted);
+  padding: 5px 0;
+  font-size: 0.94rem;
+  transition: color 0.2s ease;
+}
+
+.footer-col a:hover {
+  color: var(--text);
+}
+
+.footer-bottom {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ===== Reveal animasyonu ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .hero-grid,
+  .page-hero-grid,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-visual,
+  .page-hero-visual {
+    order: -1;
+  }
+
+  .rooms-grid,
+  .product-grid,
+  .values-grid,
+  .feature-list {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-links {
+    position: fixed;
+    inset: 72px 0 auto 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px 24px;
+    transform: translateY(-120%);
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow);
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
+  }
+
+  .nav-links a {
+    padding: 12px 14px;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 560px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-actions {
+    width: 100%;
+  }
+  .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
