@@ -311,6 +311,19 @@
 
     return (
       '<div class="cfg">' +
+      // Canlı ürün önizlemesi (gerçek ürün fotoğrafı)
+      '<div class="cfg-preview">' +
+      '<div class="cfg-preview-stage" data-preview>' +
+      '<img class="cfg-preview-img" data-preview-img alt="" />' +
+      '<span class="cfg-preview-badge" data-preview-price></span>' +
+      "</div>" +
+      '<div class="cfg-preview-meta">' +
+      '<span class="cfg-preview-name" data-preview-name></span>' +
+      '<span class="cfg-preview-dims" data-preview-dims></span>' +
+      "</div>" +
+      '<div class="cfg-preview-spec" data-preview-spec></div>' +
+      '<p class="cfg-preview-hint">Müşteri görünümü — gerçek ürün. Seçtiğin ölçü, malzeme ve renk anlık yansır.</p>' +
+      "</div>" +
       // Fiyatlandırma paneli
       '<div class="cfg-panel">' +
       '<div class="cfg-field"><label>Mobilya</label><select class="cfg-select" data-piece>' + pieceOpts + "</select></div>" +
@@ -361,6 +374,12 @@
     var addBtn = $("[data-add]");
     var cartBody = $("[data-cart-body]");
     var quoteEl = $("[data-quote]");
+    var previewHost = $("[data-preview]");
+    var previewImg = $("[data-preview-img]");
+    var previewNameEl = $("[data-preview-name]");
+    var previewDimsEl = $("[data-preview-dims]");
+    var previewSpecEl = $("[data-preview-spec]");
+    var previewPriceEl = $("[data-preview-price]");
 
     var state = {
       pieceIndex: 0,
@@ -402,6 +421,34 @@
 
     function refreshUnit() {
       unitEl.textContent = money(calcUnit());
+      refreshPreview();
+    }
+
+    /* --- Canlı ürün önizlemesi (gerçek ürün fotoğrafı) --- */
+    function renderPreviewNow() {
+      if (!previewHost) return;
+      var p = pieces[state.pieceIndex];
+      var w = parseFloat(wIn.value) || p.w;
+      var h = parseFloat(hIn.value) || p.h;
+      var d = parseFloat(dIn.value) || p.d;
+      var mat = findById(MATERIALS, matSel.value);
+      var fin = findById(FINISHES, finSel.value);
+      var color = findById(COLORS, state.color);
+
+      if (previewImg && p.gorsel && previewImg.getAttribute("src") !== p.gorsel) {
+        previewImg.onerror = function () { previewHost.classList.add("img-broken"); };
+        previewImg.onload = function () { previewHost.classList.remove("img-broken"); };
+        previewImg.src = p.gorsel;
+        previewImg.alt = p.name;
+      }
+      if (previewNameEl) previewNameEl.textContent = p.name;
+      if (previewDimsEl) previewDimsEl.textContent = w + " × " + h + " × " + d + " cm";
+      if (previewSpecEl) previewSpecEl.textContent = mat.name + " · " + fin.name + " · " + color.name;
+      if (previewPriceEl) previewPriceEl.textContent = money(calcUnit());
+    }
+
+    function refreshPreview() {
+      renderPreviewNow();
     }
 
     /* --- Fotoğraf yükleme --- */
@@ -771,6 +818,7 @@
         });
         sw.classList.add("selected");
         state.color = sw.getAttribute("data-color");
+        refreshPreview();
       });
     });
     addBtn.addEventListener("click", addItem);
