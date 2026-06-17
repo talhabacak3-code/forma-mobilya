@@ -327,22 +327,6 @@
       '<div class="cfg-unit"><span class="cfg-unit-label">Birim</span><span class="cfg-unit-price" data-unit>₺0</span></div></div>' +
       '<button type="button" class="btn btn--primary cfg-add" data-add>Listeye Ekle</button>' +
       "</div>" +
-      // Ürünü odanda gör (oda fotoğrafı + ürün yerleştirme)
-      '<div class="cfg-room">' +
-      '<div class="cfg-room-head">Ürünü odanda gör</div>' +
-      '<div class="cfg-photo" data-drop>' +
-      '<input type="file" accept="image/*" hidden data-file>' +
-      '<div class="cfg-photo-empty">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="9" r="1.5"/></svg>' +
-      "<strong>Odanın fotoğrafını yükle</strong>" +
-      'Sürükle bırak ya da tıkla — “Listeye Ekle” dediğin ürünler odanın üstünde belirir</div>' +
-      "</div>" +
-      '<div class="cfg-photo-actions">' +
-      '<button type="button" class="cfg-link" data-change hidden>Fotoğrafı değiştir</button>' +
-      '<button type="button" class="cfg-link" data-clear hidden>Kaldır</button>' +
-      "</div>" +
-      '<p class="cfg-hint">İpucu: Ürün fotoğrafını sürükleyip köşesinden boyutlandırabilirsin. En gerçekçi sonuç için arka planı silinmiş (PNG) ürün fotoğrafı kullan.</p>' +
-      "</div>" +
       "</div>" +
       // Sepet
       '<div class="cfg-cart">' +
