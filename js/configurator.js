@@ -340,6 +340,22 @@
       '<div class="cfg-unit"><span class="cfg-unit-label">Birim</span><span class="cfg-unit-price" data-unit>₺0</span></div></div>' +
       '<button type="button" class="btn btn--primary cfg-add" data-add>Listeye Ekle</button>' +
       "</div>" +
+      // Ürünü odanda gör (oda fotoğrafı + ürün yerleştirme)
+      '<div class="cfg-room">' +
+      '<div class="cfg-room-head">Ürünü odanda gör</div>' +
+      '<div class="cfg-photo" data-drop>' +
+      '<input type="file" accept="image/*" hidden data-file>' +
+      '<div class="cfg-photo-empty">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="9" r="1.5"/></svg>' +
+      "<strong>Odanın fotoğrafını yükle</strong>" +
+      'Sürükle bırak ya da tıkla — “Listeye Ekle” dediğin ürünler odanın üstünde belirir</div>' +
+      "</div>" +
+      '<div class="cfg-photo-actions">' +
+      '<button type="button" class="cfg-link" data-change hidden>Fotoğrafı değiştir</button>' +
+      '<button type="button" class="cfg-link" data-clear hidden>Kaldır</button>' +
+      "</div>" +
+      '<p class="cfg-hint">İpucu: Ürün fotoğrafını sürükleyip köşesinden boyutlandırabilirsin. En gerçekçi sonuç için arka planı silinmiş (PNG) ürün fotoğrafı kullan.</p>' +
+      "</div>" +
       "</div>" +
       // Sepet
       '<div class="cfg-cart">' +
@@ -476,7 +492,7 @@
 
     if (photo) {
     photo.addEventListener("click", function (e) {
-      if (e.target.closest(".cfg-marker, .cfg-model")) return;
+      if (e.target.closest(".cfg-marker, .cfg-model, .cfg-room-item")) return;
       if (!photo.classList.contains("has-photo")) fileInput.click();
     });
     changeBtn.addEventListener("click", function () {
@@ -612,50 +628,25 @@
       handle.addEventListener("pointercancel", end);
     }
 
-    /* Fotoğraf üzerine modeli yerleştir (Three.js varsa gerçek 3D) */
+    /* Oda fotoğrafının üzerine gerçek ürün fotoğrafını yerleştir */
     function addModel(item) {
+      if (!photo) return;
       var idx = cart.indexOf(item);
       if (idx < 0) idx = cart.length;
       var wrap = document.createElement("div");
-      wrap.className = "cfg-model";
+      wrap.className = "cfg-room-item";
       wrap.dataset.id = item.id;
       wrap.style.left = 24 + ((idx * 28) % 160) + "px";
       wrap.style.top = 24 + ((idx * 32) % 150) + "px";
-
-      var use3D = window.Furniture3D && window.Furniture3D.available();
-
-      if (use3D) {
-        wrap.classList.add("cfg-model--3d");
-        wrap.style.width = "180px";
-        wrap.innerHTML =
-          '<span class="cfg-model-badge">' + item.no + "</span>" +
-          '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
-          '<button type="button" class="cfg-model-move" title="Taşı">✥</button>' +
-          '<div class="cfg-model-canvas"></div>' +
-          '<span class="cfg-model-name">' + escapeHtml(item.name) + "</span>" +
-          '<span class="cfg-model-resize" title="Boyutlandır"></span>';
-        photo.appendChild(wrap);
-        var host = wrap.querySelector(".cfg-model-canvas");
-        item.three = window.Furniture3D.create(host, item.piece, {
-          color: item.hex,
-          finish: item.finishId,
-          size: 180
-        });
-        makeMovable(wrap, wrap.querySelector(".cfg-model-move"));
-        makeResizable3D(wrap, item);
-      } else {
-        wrap.style.width = "130px";
-        wrap.innerHTML =
-          '<span class="cfg-model-badge">' + item.no + "</span>" +
-          '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
-          buildModel(item.piece, item.hex) +
-          '<span class="cfg-model-name">' + escapeHtml(item.name) + "</span>" +
-          '<span class="cfg-model-resize" title="Boyutlandır"></span>';
-        photo.appendChild(wrap);
-        makeDraggable(wrap);
-        makeResizable(wrap);
-      }
-
+      wrap.style.width = "160px";
+      wrap.innerHTML =
+        '<span class="cfg-model-badge">' + item.no + "</span>" +
+        '<button type="button" class="cfg-model-del" title="Kaldır">×</button>' +
+        '<img src="' + (item.gorsel || "") + '" alt="' + escapeHtml(item.name) + '" draggable="false">' +
+        '<span class="cfg-model-resize" title="Boyutlandır"></span>';
+      photo.appendChild(wrap);
+      makeDraggable(wrap);
+      makeResizable(wrap);
       wrap.querySelector(".cfg-model-del").addEventListener("click", function (e) {
         e.stopPropagation();
         removeItem(item.id);
@@ -752,7 +743,8 @@
         total: unit * qty,
         piece: { name: p.name, w: parseFloat(wIn.value) || p.w, h: parseFloat(hIn.value) || p.h, d: parseFloat(dIn.value) || p.d },
         hex: color.hex,
-        finishId: fin.id
+        finishId: fin.id,
+        gorsel: p.gorsel
       };
       cart.push(item);
       if (photo && photo.classList.contains("has-photo")) addModel(item);

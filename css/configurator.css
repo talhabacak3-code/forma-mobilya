@@ -94,6 +94,45 @@
   margin-top: 10px;
 }
 
+/* Ürünü odanda gör */
+.cfg-room {
+  margin-top: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 18px;
+}
+
+.cfg-room-head {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.cfg-room-item {
+  position: absolute;
+  width: 160px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.35));
+  z-index: 2;
+}
+
+.cfg-room-item.dragging {
+  cursor: grabbing;
+  z-index: 5;
+}
+
+.cfg-room-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
 /* --- Sahne / fotoğraf alanı --- */
 .cfg-stage {
   position: sticky;
