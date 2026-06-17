@@ -311,19 +311,6 @@
 
     return (
       '<div class="cfg">' +
-      // Canlı ürün önizlemesi (gerçek ürün fotoğrafı)
-      '<div class="cfg-preview">' +
-      '<div class="cfg-preview-stage" data-preview>' +
-      '<img class="cfg-preview-img" data-preview-img alt="" />' +
-      '<span class="cfg-preview-badge" data-preview-price></span>' +
-      "</div>" +
-      '<div class="cfg-preview-meta">' +
-      '<span class="cfg-preview-name" data-preview-name></span>' +
-      '<span class="cfg-preview-dims" data-preview-dims></span>' +
-      "</div>" +
-      '<div class="cfg-preview-spec" data-preview-spec></div>' +
-      '<p class="cfg-preview-hint">Müşteri görünümü — gerçek ürün. Seçtiğin ölçü, malzeme ve renk anlık yansır.</p>' +
-      "</div>" +
       // Fiyatlandırma paneli
       '<div class="cfg-panel">' +
       '<div class="cfg-field"><label>Mobilya</label><select class="cfg-select" data-piece>' + pieceOpts + "</select></div>" +
